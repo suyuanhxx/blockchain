@@ -1,8 +1,6 @@
 package main
 
 import (
-	//"github.com/deckarep/golang-set"
-	//"container/list"
 	"encoding/json"
 	"crypto/sha256"
 	"encoding/hex"
@@ -68,24 +66,31 @@ func (t *Blockchain) lastBlock() {
 
 }
 
-func (t *Blockchain) hash(block []string) string {
-	var blockString string
-	json.Unmarshal([]byte(block), &blockString)
-	hash256.Write([]byte(blockString))
-	hashResult := hex.EncodeToString(hash256.Sum(nil))
-	return hashResult
-}
-
-func (t *Blockchain) proof_of_work(lastProof int) int {
+func (t *Blockchain) proofOfWork(lashBlock Block) int {
+	lastProof := lashBlock.Proof
+	lastHash := Hash(lashBlock)
 	proof := 0
-	for !ValidProof(lastProof, proof) {
+	for !ValidProof(lastProof, proof, lastHash) {
 		proof += 1
 	}
 	return 0
 }
 
-func ValidProof(lastProof int, proof int) bool {
-	return false
+func Hash(block Block) string {
+	var blockString string
+	json.Unmarshal([]byte(block), &blockString)
+	return Sha256(blockString)
+}
+
+func ValidProof(lastProof int, proof int, lastHash string) bool {
+	guess := string(lastProof) + string(proof) + lastHash
+	guessHash := Sha256(guess)
+	return guessHash[:4] == "0000"
+}
+
+func Sha256(str string) string {
+	hash256.Write([]byte(str))
+	return hex.EncodeToString(hash256.Sum(nil))
 }
 
 func Mine() {
