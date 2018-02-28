@@ -14,11 +14,11 @@ var hash = sha1.New()
 var hash256 = sha256.New()
 
 type Block struct {
-	Index        int       `json:"index"`
-	Timestamp    time.Time `json:"timestamp"`
-	Transactions []json    `json:"transactions"`
-	Proof        int       `json:"proof"`
-	PreviousHash string    `json:"previous_hash"`
+	Index        int           `json:"index"`
+	Timestamp    time.Time     `json:"timestamp"`
+	Transactions []Transaction `json:"transactions"`
+	Proof        int           `json:"proof"`
+	PreviousHash string        `json:"previous_hash"`
 }
 
 type Transaction struct {
@@ -76,7 +76,7 @@ func (t *Blockchain) hash(block []string) string {
 	return hashResult
 }
 
-func (t *Blockchain) proof_of_work(lastProof int) int {
+func (t *Blockchain) proofOfWork(lastProof int) int {
 	proof := 0
 	for !ValidProof(lastProof, proof) {
 		proof += 1
