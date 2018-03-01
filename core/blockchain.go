@@ -42,6 +42,13 @@ func (t *Blockchain) RegisterNode(address string) {
 	t.Nodes.Add(parsedUrl.Host)
 }
 
+// Create the genesis block
+func (t *Blockchain) New() *Blockchain {
+	t = new(Blockchain)
+	t.NewBlock(100, "1")
+	return t
+}
+
 func (t *Blockchain) ValidChain(chain []Block) bool {
 	lastBlock := chain[0]
 	currentIndex := 1
@@ -100,14 +107,21 @@ func (t *Blockchain) NewBlock(proof int, previousHash string) Block {
 	} else {
 		block.PreviousHash = t.Hash(t.Chain[len(t.Chain)-1])
 	}
-	//t.CurrentTransactions = []
+
+	if len(t.CurrentTransactions) != 0 {
+		block.Transactions = append(block.Transactions, t.CurrentTransactions[0])
+	}
+	t.CurrentTransactions = []Transaction{}
 	t.Chain = append(t.Chain, *block)
 	return *block
 }
 
 func (t *Blockchain) NewTransaction(sender string, recipient string, amount int) int {
-	transaction := Transaction{Sender: sender, Recipient: recipient, Amount: amount}
-	t.CurrentTransactions = append(t.CurrentTransactions, transaction)
+	transaction := new(Transaction)
+	transaction.Sender = sender
+	transaction.Recipient = recipient
+	transaction.Amount = amount
+	t.CurrentTransactions = append(t.CurrentTransactions, *transaction)
 	return t.LastBlock().Index + 1
 }
 
@@ -122,21 +136,10 @@ func (t *Blockchain) ProofOfWork(lashBlock Block) int {
 	for !ValidProof(lastProof, proof, lastHash) {
 		proof += 1
 	}
-	return 0
+	return proof
 }
 
 func (t *Blockchain) Hash(block Block) string {
 	blockString, _ := json.Marshal(block)
 	return Sha256(string(blockString))
 }
-
-//func ValidProof(lastProof int, proof int, lastHash string) bool {
-//	guess := string(lastProof) + string(proof) + lastHash
-//	guessHash := Sha256(guess)
-//	return guessHash[:4] == "0000"
-//}
-//
-//func Sha256(str string) string {
-//	hash256.Write([]byte(str))
-//	return hex.EncodeToString(hash256.Sum(nil))
-//}
