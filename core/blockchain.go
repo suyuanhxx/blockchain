@@ -11,7 +11,7 @@ import (
 
 type Block struct {
 	Index        int           `json:"index"`
-	Timestamp    time.Time     `json:"timestamp"`
+	Timestamp    string    `json:"timestamp"`
 	Transactions []Transaction `json:"transactions"`
 	Proof        int           `json:"proof"`
 	PreviousHash string        `json:"previous_hash"`
@@ -100,7 +100,7 @@ func (t *Blockchain) ResolveConflicts() bool {
 func (t *Blockchain) NewBlock(proof int, previousHash string) Block {
 	block := new(Block)
 	block.Index = len(t.Chain) + 1
-	block.Timestamp = time.Now()
+	block.Timestamp = time.Now().String()
 	block.Proof = proof
 	if previousHash != "" {
 		block.PreviousHash = previousHash
