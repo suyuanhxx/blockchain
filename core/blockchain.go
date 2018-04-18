@@ -3,7 +3,6 @@ package core
 import (
 	"encoding/json"
 	"time"
-	"net/url"
 	"fmt"
 	"net/http"
 	"github.com/deckarep/golang-set"
@@ -11,7 +10,7 @@ import (
 
 type Block struct {
 	Index        int           `json:"index"`
-	Timestamp    string    `json:"timestamp"`
+	Timestamp    string        `json:"timestamp"`
 	Transactions []Transaction `json:"transactions"`
 	Proof        int           `json:"proof"`
 	PreviousHash string        `json:"previous_hash"`
@@ -34,12 +33,11 @@ type Blockchain struct {
 	Nodes               mapset.Set
 }
 
-func (t *Blockchain) RegisterNode(address string) {
-	parsedUrl, _ := url.Parse(address)
+func (t *Blockchain) RegisterNode(host string) {
 	if t.Nodes == nil {
 		t.Nodes = mapset.NewSet()
 	}
-	t.Nodes.Add(parsedUrl.Host)
+	t.Nodes.Add(host)
 }
 
 // Create the genesis block
