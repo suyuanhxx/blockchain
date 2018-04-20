@@ -26,16 +26,14 @@ var nodeIdentifier = strings.Replace(ud.String(), "-", "", -1)
 
 var blockchain *Blockchain
 
-type HandlersFunc func(http.ResponseWriter, *http.Request)
-
 func mine(w http.ResponseWriter, r *http.Request) {
 	lastBlock := blockchain.LastBlock()
-	proof := blockchain.ProofOfWork(lastBlock)
+	proof := blockchain.Pow(lastBlock)
 
 	blockchain.NewTransaction("0", nodeIdentifier, 1)
 
 	// Forge the new Block by adding it to the chain
-	previousHash := blockchain.Hash(lastBlock)
+	previousHash := Hash(lastBlock)
 	block := blockchain.NewBlock(proof, previousHash)
 
 	response := Response{Message: "New Block Forged",
@@ -90,6 +88,8 @@ func Consensus() *Response {
 	}
 	return response
 }
+
+type HandlersFunc func(http.ResponseWriter, *http.Request)
 
 var handlersMap = make(map[string]HandlersFunc)
 

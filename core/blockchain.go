@@ -54,11 +54,11 @@ func (t *Blockchain) ValidChain(chain []Block) bool {
 	for ; currentIndex < len(chain); {
 		block := chain[currentIndex]
 		fmt.Println(lastBlock, block)
-		if block.PreviousHash != t.Hash(lastBlock) {
+		if block.PreviousHash != Hash(lastBlock) {
 			return false
 		}
 
-		if !ValidProof(lastBlock.Proof, block.Proof, lastBlock.PreviousHash) {
+		if !t.ValidProof(lastBlock.Proof, block.Proof, lastBlock.PreviousHash) {
 			return false
 		}
 		lastBlock = block
@@ -103,7 +103,7 @@ func (t *Blockchain) NewBlock(proof int, previousHash string) Block {
 	if previousHash != "" {
 		block.PreviousHash = previousHash
 	} else {
-		block.PreviousHash = t.Hash(t.Chain[len(t.Chain)-1])
+		block.PreviousHash = Hash(t.Chain[len(t.Chain)-1])
 	}
 
 	if len(t.CurrentTransactions) != 0 {
@@ -125,19 +125,4 @@ func (t *Blockchain) NewTransaction(sender string, recipient string, amount int)
 
 func (t *Blockchain) LastBlock() Block {
 	return t.Chain[len(t.Chain)-1]
-}
-
-func (t *Blockchain) ProofOfWork(lashBlock Block) int {
-	lastProof := lashBlock.Proof
-	lastHash := t.Hash(lashBlock)
-	proof := 0
-	for !ValidProof(lastProof, proof, lastHash) {
-		proof += 1
-	}
-	return proof
-}
-
-func (t *Blockchain) Hash(block Block) string {
-	blockString, _ := json.Marshal(block)
-	return Sha256(string(blockString))
 }

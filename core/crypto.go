@@ -3,14 +3,14 @@ package core
 import (
 	"encoding/hex"
 	"crypto/sha256"
+	"encoding/json"
 )
 
 var hash256 = sha256.New()
 
-func ValidProof(lastProof int, proof int, lastHash string) bool {
-	guess := string(lastProof) + string(proof) + lastHash
-	guessHash := Sha256(guess)
-	return guessHash[:4] == "0000"
+func Hash(block Block) string {
+	blockString, _ := json.Marshal(block)
+	return Sha256(string(blockString))
 }
 
 func Sha256(str string) string {
